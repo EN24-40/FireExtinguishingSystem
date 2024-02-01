@@ -3,8 +3,8 @@ def main():
     from gpiozero import PWMLED
     import keyboard
     import time
-    pin_w = PWMLED(21)  # 'w' key
-    pin_s = PWMLED(20)  # 's' key
+    pin_ext = PWMLED(21)  # extend pin
+    pin_ret = PWMLED(20)  # retract pin
 
 
     # Declare global variables:
