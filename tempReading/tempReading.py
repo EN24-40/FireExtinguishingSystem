@@ -3,8 +3,14 @@ import numpy as np
 
 # Opening
 image_path = '/home/remote/FireDetection/cleanframes/undistorted_Sample_Capture_7.tiff'
-
 image = cv2.imread(image_path, cv2.IMREAD_ANYDEPTH)
+
+#(240, 320) is the shape
+array = np.array(image)
+
+print(array.dtype)
+#to look at the values being read, saves a csv in current dir.
+np.savetxt("dataTemp.csv", array, delimiter = ",")
 
 # Check if the image is read successfully
 if image is not None:
