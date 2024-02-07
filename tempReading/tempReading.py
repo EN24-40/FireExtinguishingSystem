@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Opening
-image_path = '/home/remote/FireDetection/rawframes/Sample_Capture_7.tiff'
+image_path = '/home/remote/FireDetection/cleanframes/undistored_Sample_Capture_7.tiff'
 image = cv2.imread(image_path, cv2.IMREAD_ANYDEPTH)
 
 
@@ -12,10 +12,9 @@ array = np.array(image)
 #(240, 320) is the shape
 #i think its supposed to be 160x120
 #print(array.dtype)
-#the array type is 8 bits
-
+#the array type 8 bits
 #to look at the values being read, saves a csv in current dir.
-np.savetxt("dataTemp.csv", array, delimiter = ", ")
+np.savetxt("dataTemp.csv", array, delimiter = ",")
 
 # Check if the image is read successfully
 if image is not None:
