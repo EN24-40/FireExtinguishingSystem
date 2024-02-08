@@ -6,8 +6,8 @@ warnings.filterwarnings("ignore")
 cv2.namedWindow("preview")
 #cv2.namedWindow("preview2")
 
-raw_img_path = "/home/remote/FireDetection/rawframes/Sample_Capture_15.tiff"
-img_path = "/home/remote/FireDetection/cleanframes/undistorted_Sample_Capture_15.tiff"
+raw_img_path = "/home/remote/FireDetection/rawframes/Sample_Capture_3.tiff"
+img_path = "/home/remote/FireDetection/cleanframes/undistorted_Sample_Capture_3.tiff"
 
 raw_frame = cv2.imread(raw_img_path)
 frame = cv2.imread(img_path)

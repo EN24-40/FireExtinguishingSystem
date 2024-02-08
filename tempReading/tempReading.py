@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Opening
-image_path = '/home/remote/FireDetection/cleanframes/undistored_Sample_Capture_7.tiff'
+image_path = '/home/remote/FireDetection/cleanframes/undistored_Sample_Capture_3.tiff'
 image = cv2.imread(image_path, cv2.IMREAD_ANYDEPTH)
 
 

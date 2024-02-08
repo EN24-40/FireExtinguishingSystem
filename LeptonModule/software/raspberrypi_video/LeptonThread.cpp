@@ -58,8 +58,13 @@ void LeptonThread::useColormap(int newTypeColormap)
 		selectedColormap = colormap_grayscale;
 		selectedColormapSize = get_size_colormap_grayscale();
 		break;
-	default:
+	case 3:
 		typeColormap = 3;
+		selectedColormap = colormap_blackwhite;
+		selectedColormapSize = get_size_colormap_blackwhite();
+		break;
+	default:
+		typeColormap = 4;
 		selectedColormap = colormap_ironblack;
 		selectedColormapSize = get_size_colormap_ironblack();
 		break;
@@ -233,6 +238,11 @@ void LeptonThread::run()
 
 				//flip the MSB and LSB at the last second
 				valueFrameBuffer = (shelf[iSegment - 1][i*2] << 8) + shelf[iSegment - 1][i*2+1];
+				// for (int i = 0; i < 1000; i++){
+				// 	if(i==0){
+				// 		std::cout << valueFrameBuffer << std::endl;
+				// 	}
+				// }
 				if (valueFrameBuffer == 0) {
 					// Why this value is 0?
 					n_zero_value_drop_frame++;
@@ -244,6 +254,8 @@ void LeptonThread::run()
 
 				//
 				value = (valueFrameBuffer - minValue) * scale;
+
+				
 				int ofs_r = 3 * value + 0; if (colormapSize <= ofs_r) ofs_r = colormapSize - 1;
 				int ofs_g = 3 * value + 1; if (colormapSize <= ofs_g) ofs_g = colormapSize - 1;
 				int ofs_b = 3 * value + 2; if (colormapSize <= ofs_b) ofs_b = colormapSize - 1;

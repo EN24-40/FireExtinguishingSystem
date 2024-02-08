@@ -41,7 +41,7 @@ void printUsage(char *cmd) {
 
 int main( int argc, char **argv )
 {
-	int typeColormap = 3; // colormap_ironblack
+	int typeColormap = 4; // colormap_ironblack
 	int typeLepton = 2; // Lepton 2.x
 	int spiSpeed = 20; // SPI bus speed 20MHz
 	int rangeMin = -1; //
@@ -132,9 +132,13 @@ int main( int argc, char **argv )
 	thread->useColormap(typeColormap);
 	thread->useLepton(typeLepton);
 	thread->useSpiSpeedMhz(spiSpeed);
-	thread->setAutomaticScalingRange();
-	if (0 <= rangeMin) thread->useRangeMinValue(rangeMin);
-	if (0 <= rangeMax) thread->useRangeMaxValue(rangeMax);
+	//thread->setAutomaticScalingRange();
+	//if (0 <= rangeMin) thread->useRangeMinValue(rangeMin);
+	//if (0 <= rangeMax) thread->useRangeMaxValue(rangeMax);
+	rangeMin = 28315;
+	rangeMax = 31092;
+	thread->useRangeMinValue(rangeMin);
+	thread->useRangeMaxValue(rangeMax);
 	QObject::connect(thread, SIGNAL(updateImage(QImage)), &myLabel, SLOT(setImage(QImage)));
 	
 	//connect ffc button to the thread's ffc action

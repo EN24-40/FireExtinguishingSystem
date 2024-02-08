@@ -3,7 +3,7 @@ import numpy as np
 
 cv2.namedWindow("preview")
 
-img_path = "/home/remote/FireDetection/cleanframes/undistorted_Sample_Capture_15.tiff"
+img_path = "/home/remote/FireDetection/cleanframes/undistorted_Sample_Capture_3.tiff"
 frame = cv2.imread(img_path)
 
 # Convert the image to RGB color space
