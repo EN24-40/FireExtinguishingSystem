@@ -11,6 +11,9 @@ Kd = 3
 Ts = 0.01
 SP = 5
 
+lower = SP - (0.03*SP)
+upper = SP + (0.03*SP)
+
 k1 = Kp + Ki + Kd
 k2 = (-1*Kp) – (2*Kd)
 k3 = Kd
@@ -21,13 +24,26 @@ e = 0
 e1 = 0
 e2 = 0
 
-# Sample every Ts seconds:
-if (time == Ts):
-    time = time - Ts
+on = 1
 
-    # Reset error values:
-    e2 = e1
-    e1 = e
-    u_prev = u
+while on:
+    # Sample every Ts seconds:
+    if (time == Ts):
+        time = time - Ts
 
-#    act_meas = readADC()
+        # Reset error values:
+        e2 = e1
+        e1 = e
+        u_prev = u
+
+#        act_meas = readADC()
+
+        e = SP - act_meas
+
+        u = u_prev + (e*k1) + (e1*k2) + (e2*k3)
+
+#       writeDA(u)
+
+    # Exit if within threshold
+    if (u>lower) & (u<upper):
+        on = 0
