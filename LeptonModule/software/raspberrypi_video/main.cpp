@@ -64,7 +64,7 @@ int main( int argc, char **argv )
 		}
 		else if ((strcmp(argv[i], "-cm") == 0) && (i + 1 != argc)) {
 			int val = std::atoi(argv[i + 1]);
-			if ((val == 1) || (val == 2)) {
+			if ((val == 1) || (val == 2) || (val == 3)) {
 				typeColormap = val;
 				i++;
 			}
@@ -135,8 +135,8 @@ int main( int argc, char **argv )
 	//thread->setAutomaticScalingRange();
 	//if (0 <= rangeMin) thread->useRangeMinValue(rangeMin);
 	//if (0 <= rangeMax) thread->useRangeMaxValue(rangeMax);
-	rangeMin = 28315;
-	rangeMax = 31092;
+	rangeMin = 27315;
+	rangeMax = 30537;
 	thread->useRangeMinValue(rangeMin);
 	thread->useRangeMaxValue(rangeMax);
 	QObject::connect(thread, SIGNAL(updateImage(QImage)), &myLabel, SLOT(setImage(QImage)));
@@ -164,4 +164,3 @@ int main( int argc, char **argv )
 
 	return a.exec();
 }
-

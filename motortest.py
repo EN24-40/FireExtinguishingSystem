@@ -9,17 +9,26 @@ pin_s = PWMLED(21)  # for 's' key
 try:
     while True:
         
-        for i in range(50):
-            pin_w.value = 1
-            time.sleep(0.1)
+        pin_w.value = 1
+        time.sleep(1)
+        pin_w.value = 0
+        time.sleep(0.5)
+        pin_s.value = 1
+        time.sleep(1)
+        pin_s.value = 0
+        time.sleep(0.5)
 
-        pin_w.off()
+        # for i in range(50):
+        #     pin_w.value = 1
+        #     time.sleep(0.1)
 
-        for i in range(50):
-            pin_s.value = 1
-            time.sleep(0.1)
+        # pin_w.off()
 
-        pin_s.off()
+        # for i in range(50):
+        #     pin_s.value = 1
+        #     time.sleep(0.1)
+
+        # pin_s.off()
 
 except KeyboardInterrupt:
     # Clean up GPIO state

@@ -18,7 +18,7 @@ LeptonThread::LeptonThread() : QThread()
 	loglevel = 0;
 
 	//
-	typeColormap = 3; // 1:colormap_rainbow  /  2:colormap_grayscale  /  3:colormap_ironblack(default)
+	typeColormap = 4; // 1:colormap_rainbow  /  2:colormap_grayscale  /  3:colormap_ironblack(default)
 	selectedColormap = colormap_ironblack;
 	selectedColormapSize = get_size_colormap_ironblack();
 
@@ -238,11 +238,7 @@ void LeptonThread::run()
 
 				//flip the MSB and LSB at the last second
 				valueFrameBuffer = (shelf[iSegment - 1][i*2] << 8) + shelf[iSegment - 1][i*2+1];
-				// for (int i = 0; i < 1000; i++){
-				// 	if(i==0){
-				// 		std::cout << valueFrameBuffer << std::endl;
-				// 	}
-				// }
+				
 				if (valueFrameBuffer == 0) {
 					// Why this value is 0?
 					n_zero_value_drop_frame++;
