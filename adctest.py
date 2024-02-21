@@ -53,5 +53,11 @@ def read_ads1115(channel):
 # Loop to read the analog input continuously
 while True:
     analog_value, voltage = read_ads1115(0)  # Reading from channel 0
-    print("Analog Value: ", analog_value, "Voltage: ", voltage)
+    
+    inches = 0.75 + (analog_value-778) / 21827 * 6
+    if inches > 6:
+        inches = 6
+    if inches < 0:
+        inches = 0
+    print("Analog Value: ", analog_value, "Voltage: ", voltage, "Inches: ", inches)
     time.sleep(0.2)

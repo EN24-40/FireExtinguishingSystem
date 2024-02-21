@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import pigpio
 import time
 
 pin_extend = 21  # for 'w' key
@@ -18,13 +19,13 @@ try:
     while True:
         
         print("extending")
-        pi_pwm_extend.ChangeDutyCycle(50)
-        time.sleep(2)
+        pi_pwm_extend.ChangeDutyCycle(100)
+        time.sleep(0)
         pi_pwm_extend.ChangeDutyCycle(0)
         time.sleep(1)
         print("retracting")
-        pi_pwm_retract.ChangeDutyCycle(50)
-        time.sleep(2)
+        pi_pwm_retract.ChangeDutyCycle(100)
+        time.sleep(6)
         pi_pwm_retract.ChangeDutyCycle(0)
         time.sleep(1)
 
@@ -42,4 +43,6 @@ try:
 
 except KeyboardInterrupt:
     # Clean up GPIO state
+    pi_pwm_extend.ChangeDutyCycle(0)
+    pi_pwm_retract.ChangeDutyCycle(0)
     print("\nScript terminated by user.")
