@@ -4,7 +4,7 @@ import time
 pin_out = PMWLED(20)
 pin_in = PMWLED(21)
 
-# Sample Parameters
+# Sample Parameters (will be changed before and after tuning)
 Kp = 0.8
 Ki = 2
 Kd = 3
@@ -27,22 +27,22 @@ e2 = 0
 on = 1
 
 while on:
-    # Sample every Ts seconds:
-    if (time == Ts):
-        time = time - Ts
+    # Reset error values:
+    e2 = e1
+    e1 = e
+    u_prev = u
 
-        # Reset error values:
-        e2 = e1
-        e1 = e
-        u_prev = u
+#   act_meas = readADC()
+    # This command will be changed to fit with the function definition in adctest.py
 
-#        act_meas = readADC()
+    e = SP = act_meas
 
-        e = SP - act_meas
+    u = u_prev + (e*k1) + (e1*k2) + (e2*k3)
 
-        u = u_prev + (e*k1) + (e1*k2) + (e2*k3)
+#   writeDA(u)
+    # This command will also be changed to fit with the function definition in adctest.py
 
-#       writeDA(u)
+    time.sleep(Ts)
 
     # Exit if within threshold
     if (u>lower) & (u<upper):
