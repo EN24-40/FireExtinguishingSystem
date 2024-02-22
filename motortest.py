@@ -1,48 +1,35 @@
-import RPi.GPIO as GPIO
-import pigpio
+from gpiozero import PWMLED
 import time
 
-pin_extend = 21  # for 'w' key
-pin_retract = 20  # for 's' key
-
-GPIO.setwarnings(False)			#disable warnings
-GPIO.setmode(GPIO.BCM)		#set pin numbering system
-GPIO.setup(pin_extend, GPIO.OUT)
-pi_pwm_extend = GPIO.PWM(pin_extend, 100)		#create PWM instance with frequency
-pi_pwm_extend.start(0)	
-
-GPIO.setup(pin_retract, GPIO.OUT)
-pi_pwm_retract = GPIO.PWM(pin_retract, 100)		#create PWM instance with frequency
-pi_pwm_retract.start(0)	
+# Set up the GPIO pins
+pin_w = PWMLED(21)  # for 'w' key
+pin_s = PWMLED(20)  # for 's' key
 
 try:
-    while True:
-        
-        print("extending")
-        pi_pwm_extend.ChangeDutyCycle(100)
-        time.sleep(0)
-        pi_pwm_extend.ChangeDutyCycle(0)
-        time.sleep(1)
-        print("retracting")
-        pi_pwm_retract.ChangeDutyCycle(100)
-        time.sleep(6)
-        pi_pwm_retract.ChangeDutyCycle(0)
-        time.sleep(1)
 
-        # for i in range(50):
-        #     pin_extend.value = 1
-        #     time.sleep(0.1)
+    print("extending")
+    
+    pin_w.value = 1
+    time.sleep(3)
 
-        # pin_extend.off()
+    pin_w.off()
 
-        # for i in range(50):
-        #     pin_retract.value = 1
-        #     time.sleep(0.1)
+    time.sleep(1)
 
-        # pin_retract.off()
+    print("retracting")
+
+    
+    pin_s.value = 1
+    time.sleep(3)
+
+    pin_s.off()
+
+    time.sleep(1)
 
 except KeyboardInterrupt:
     # Clean up GPIO state
-    pi_pwm_extend.ChangeDutyCycle(0)
-    pi_pwm_retract.ChangeDutyCycle(0)
+    pin_w.value = 0
+    pin_w.value = 0
+    pin_w.off()
+    pin_s.off()
     print("\nScript terminated by user.")
