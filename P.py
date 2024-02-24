@@ -1,7 +1,7 @@
 from gpiozero import PWMLED
 import time
 import smbus
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 # Set PWM pins
 pin_ret = PWMLED(20)
@@ -85,10 +85,10 @@ def write_pwm(u, pin_e, pin_r):
         pin_r.value = u_s
         
 # Sample Parameters (will be changed before and after tuning)
-Kp = 1.5
-Ts = 0.1
+Kp = 5
+Ts = 0.05
 SP = float(input("set point (in): "))
-thresh = 1/72
+thresh = 0.01
 
 lower = SP - thresh
 upper = SP + thresh
@@ -97,14 +97,7 @@ count = 0
 
 start_time = time.time()
 
-for i in range(10):
-    act_ana, act_voltage, act_meas = read_ads1115(0)
-
-    data.append(act_meas)
-    times.append(time.time() - start_time)
-    time.sleep(Ts)
-
-for i in range(100):
+for i in range(400):
         act_ana, act_voltage, act_meas = read_ads1115(0)
         # This command will be changed to fit with the function definition in adctest.py
 
@@ -143,8 +136,9 @@ pin_ret.value = 0
 pin_ext.off()
 pin_ret.off()
 
-plt.title("Step Response of Linear Actuator")
+plt.title(f"Step Response of Linear Actuator, Kp = {Kp}")
 plt.ylabel("Length (in)")
-plt.xlabel("Sample #")
-plt.plot(times, data, linewidth=2.0)
+plt.xlabel("Time (sec)")
+plt.plot(times, data, linewidth=1.0)
+plt.savefig("stepresponse.png")
 plt.show()
