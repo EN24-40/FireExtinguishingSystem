@@ -1,6 +1,7 @@
 from gpiozero import PWMLED
 import time
 import smbus
+import math
 import matplotlib.pyplot as plt
 
 # Set PWM pins
@@ -85,28 +86,44 @@ def write_pwm(u, pin_e, pin_r):
         pin_r.value = u_s
         
 # Sample Parameters (will be changed before and after tuning)
-Kp = 5
-Ts = 0.1
+# Testing had Ku = 12, with Tu = 0.2
+Kp = 7.2    #0.6*Ku
+Ki = 72		#Kp/0.5*Tu
+Kd = 0.18      #0.125*Kp*Tu
+
+# PID Specific Parameters
+integral = 0
+deriv = 0
+
+Ts = 0.05
 SP = float(input("set point (in): "))
-thresh = 0.01
+thresh = 0.005
 
 lower = SP - thresh
 upper = SP + thresh
 
+e = 0
+e_prev = 0
+
 count = 0
 
 start_time = time.time()
+act_meas = 0
 
-for i in range(400):
+for i in range(200):
+        prev_meas = act_meas
         act_ana, act_voltage, act_meas = read_ads1115(0)
         # This command will be changed to fit with the function definition in adctest.py
+
+        if ((prev_meas > SP) and (act_meas < SP)) or ((prev_meas < SP) and (act_meas > SP)):
+            print("cross time = ", time.time()-start_time)
 
         if act_meas > lower and act_meas < upper:
             count = count + 1
         else:
             count = 0
 
-        if count >= 10:
+        if count >= 20:
             print("breaked")
             break
 
@@ -119,7 +136,13 @@ for i in range(400):
         if SP < offset:
             SP = offset
 
+        e_prev = e		# Added
+
         e = SP - act_meas
+
+        # Added PID Specific Code
+        integral += e * Ts
+        deriv = (e - e_prev) / Ts
 
         data.append(act_meas)
         times.append(time.time() - start_time)
@@ -136,9 +159,17 @@ pin_ret.value = 0
 pin_ext.off()
 pin_ret.off()
 
-plt.title(f"Step Response of Linear Actuator, Kp = {Kp}")
+plt.title(f"Step Response of Linear Actuator, Kp = {Kp}, Ki = {Ki}, Kd = {Kd}")
 plt.ylabel("Length (in)")
 plt.xlabel("Time (sec)")
 plt.plot(times, data, linewidth=1.0)
 plt.savefig("stepresponse.png")
-plt.show()
+
+
+plt.title(f"Step Response of Linear Actuator, Kp = {Kp}, Ki = {Ki}, Kd = {Kd}")
+plt.ylabel("Length (in)")
+plt.xlabel("Time (sec)")
+plt.plot(times, data, linewidth=1.0)
+plt.ylim([SP-0.05, SP+0.05])
+plt.xlim([times[math.floor(len(times)/2)],times[len(times)-1]])
+plt.savefig("stepresponsezoom.png")
