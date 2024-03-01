@@ -1,5 +1,12 @@
-import smbus
+from gpiozero import PWMLED
 import time
+import smbus
+
+# Set PWM pins
+pin_ret = PWMLED(20)
+pin_ext = PWMLED(21)
+
+offset = 1.25
 
 # ADS1115 default address
 ADS1115_ADDRESS = 0x48
@@ -19,7 +26,6 @@ ADS1115_CONFIG_CPOL_ACTVLOW = 0x0000  # Active low
 ADS1115_CONFIG_CLAT_NONLAT = 0x0000  # Non-latching
 ADS1115_CONFIG_CQUE_NONE = 0x0003  # Disable comparator
 
-# Initialize I2C (SMBus)
 bus = smbus.SMBus(1)
 
 def read_ads1115(channel):
@@ -49,17 +55,87 @@ def read_ads1115(channel):
         value -= 1 << 16
     voltage = value * 4.096 / 32767.0
 
-    inches = 1.25 + (value-950) / 21827 * 6
-    if inches > 6.75:
-        inches = 6.75
+    inches = offset + (value-950) / 21827 * 6
+    if inches > offset + 6:
+        inches = offset + 6
     if inches < 0:
         inches = 0
 
     return value, voltage, inches
 
-# Loop to read the analog input continuously
-while True:
-    analog_value, voltage, inches = read_ads1115(0)  # Reading from channel 0
- 
-    print("Analog Value: ", analog_value, "Voltage: ", round(voltage, 3), "Inches: ", round(inches, 3))
-    time.sleep(0.2)
+def write_pwm(u, pin_e, pin_r):
+    d = 0
+    if u > 0:
+        d = 1
+    
+    u_s = abs(u)
+
+    if u_s > 1:
+        u_s = 1
+    
+    if d == 1:
+        pin_e.value = u_s
+        pin_r.value = 0
+    else:
+        pin_e.value = 0
+        pin_r.value = u_s
+        
+# Sample Parameters (will be changed before and after tuning)
+Kp = 1.5
+Ki = 1		# Added
+Kd = 0.8	# Added
+Ts = 0.1	# Check if true time between iterations:
+SP = float(input("set point (in): "))
+thresh = 1/72
+
+# PID Specific Parameters
+integral = 0
+deriv = 0
+
+lower = SP - thresh
+upper = SP + thresh
+
+count = 0
+
+for i in range(100):
+        act_ana, act_voltage, act_meas = read_ads1115(0)
+        # This command will be changed to fit with the function definition in adctest.py
+
+        if act_meas > lower and act_meas < upper:
+            count = count + 1
+        else:
+            count = 0
+
+        if count >= 10:
+            print("breaked")
+            break
+
+        if act_meas >= offset + 6 or act_meas < offset:
+            break
+
+
+        if SP > offset + 6:
+            SP = offset + 6
+        if SP < offset:
+            SP = offset
+
+	e_prev = e		# Added
+
+        e = SP - act_meas
+
+	# Added PID Specific Code
+	integral += e * Ts
+	deriv = (e - e_prev) / Ts
+
+	# Edited Formula
+        u = (Kp*e) + (Ki*integral) + (Kd*derivative)
+
+        write_pwm(u,pin_ext, pin_ret)
+        # This command will also be changed to fit with the function definition in adctest.py
+
+        time.sleep(Ts)
+
+pin_ext.value = 0
+pin_ret.value = 0
+pin_ext.off()
+pin_ret.off()

@@ -1,10 +1,16 @@
 from gpiozero import PWMLED
 import time
 import smbus
+import matplotlib.pyplot as plt
 
 # Set PWM pins
-pin_ret = PMWLED(20)
-pin_ext = PMWLED(21)
+pin_ret = PWMLED(20)
+pin_ext = PWMLED(21)
+
+offset = 1.25
+
+data = []
+times = []
 
 # ADS1115 default address
 ADS1115_ADDRESS = 0x48
@@ -53,64 +59,86 @@ def read_ads1115(channel):
         value -= 1 << 16
     voltage = value * 4.096 / 32767.0
 
-    inches = 0.75 + (value-778) / 21827 * 6
-    if inches > 6.75:
-        inches = 6.75
+    inches = offset + (value-950) / 21827 * 6
+    if inches > offset + 6:
+        inches = offset + 6
     if inches < 0:
         inches = 0
 
     return value, voltage, inches
 
-def write_pwm(u,SP):
-    if u < SP:
-        pin_ext.value = 1
-    if u > SP:
-        pin_ret.value = 1
+def write_pwm(u, pin_e, pin_r):
+    d = 0
+    if u > 0:
+        d = 1
+    
+    u_s = abs(u)
 
-
-
+    if u_s > 1:
+        u_s = 1
+    
+    if d == 1:
+        pin_e.value = u_s
+        pin_r.value = 0
+    else:
+        pin_e.value = 0
+        pin_r.value = u_s
+        
 # Sample Parameters (will be changed before and after tuning)
-Kp = 0.8
-Ki = 2
-Kd = 3
-Ts = 0.01
-SP = 5
+Kp = 5
+Ts = 0.1
+SP = float(input("set point (in): "))
+thresh = 0.01
 
-lower = SP - (0.05*SP)
-upper = SP + (0.05*SP)
+lower = SP - thresh
+upper = SP + thresh
 
-k1 = Kp + Ki + Kd
-k2 = (-1*Kp) - (2*Kd)
-k3 = Kd
+count = 0
 
-u_prev = 0
-u = 0
-e = 0
-e1 = 0
-e2 = 0
+start_time = time.time()
 
-on = 1
+for i in range(400):
+        act_ana, act_voltage, act_meas = read_ads1115(0)
+        # This command will be changed to fit with the function definition in adctest.py
 
-while on:
-    # Reset error values:
-    e2 = e1
-    e1 = e
-    u_prev = u
+        if act_meas > lower and act_meas < upper:
+            count = count + 1
+        else:
+            count = 0
 
-    act_ana, act_voltage, act_meas = read_ads1115(0)
-    # This command will be changed to fit with the function definition in adctest.py
+        if count >= 10:
+            print("breaked")
+            break
 
-    e = SP - act_meas
+        if act_meas >= offset + 6 or act_meas < offset:
+            break
 
-    u = u_prev + (e*k1) + (e1*k2) + (e2*k3)
 
-    if act_meas < SP
+        if SP > offset + 6:
+            SP = offset + 6
+        if SP < offset:
+            SP = offset
 
-    write_pwm(u,SP)
-    # This command will also be changed to fit with the function definition in adctest.py
+        e = SP - act_meas
 
-    time.sleep(Ts-0.002)
+        data.append(act_meas)
+        times.append(time.time() - start_time)
 
-    # Exit if within threshold
-    if (u>lower) & (u<upper):
-        on = 0
+        u = Kp * e
+
+        write_pwm(u,pin_ext, pin_ret)
+        # This command will also be changed to fit with the function definition in adctest.py
+
+        time.sleep(Ts)
+
+pin_ext.value = 0
+pin_ret.value = 0
+pin_ext.off()
+pin_ret.off()
+
+plt.title(f"Step Response of Linear Actuator, Kp = {Kp}")
+plt.ylabel("Length (in)")
+plt.xlabel("Time (sec)")
+plt.plot(times, data, linewidth=1.0)
+plt.savefig("stepresponse.png")
+plt.show()

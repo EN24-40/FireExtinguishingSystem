@@ -3,8 +3,10 @@ import time
 import smbus
 
 # Set PWM pins
-pin_ret = PMWLED(20)
-pin_ext = PMWLED(21)
+pin_ret = PWMLED(20)
+pin_ext = PWMLED(21)
+
+offset = 1.25
 
 # ADS1115 default address
 ADS1115_ADDRESS = 0x48
@@ -53,64 +55,92 @@ def read_ads1115(channel):
         value -= 1 << 16
     voltage = value * 4.096 / 32767.0
 
-    inches = 0.75 + (value-778) / 21827 * 6
-    if inches > 6.75:
-        inches = 6.75
+    inches = offset + (value-950) / 21827 * 6
+    if inches > offset + 6:
+        inches = offset + 6
     if inches < 0:
         inches = 0
 
     return value, voltage, inches
 
-def write_pwm(u,SP):
-    if u < SP:
-        pin_ext.value = 1
-    if u > SP:
-        pin_ret.value = 1
+def write_pwm(u, pin_e, pin_r):
+    d = 0
+    if u > 0:
+        d = 1
+    
+    u_s = abs(u)
 
-
-
+    if u_s > 1:
+        u_s = 1
+    
+    if d == 1:
+        pin_e.value = u_s
+        pin_r.value = 0
+    else:
+        pin_e.value = 0
+        pin_r.value = u_s
+        
 # Sample Parameters (will be changed before and after tuning)
-Kp = 0.8
-Ki = 2
-Kd = 3
-Ts = 0.01
-SP = 5
+Kp = 1.5
+Ki = 1		# Added
+Kd = 0.8	# Added
+Ts = 0.1
+SP = float(input("set point (in): "))
+thresh = 1/72
 
-lower = SP - (0.05*SP)
-upper = SP + (0.05*SP)
-
-k1 = Kp + Ki + Kd
-k2 = (-1*Kp) - (2*Kd)
-k3 = Kd
-
-u_prev = 0
-u = 0
+# PID Specific Parameters
+K1 = Kp + Ki + Kd
+K2 = (-1*Kp) - (2*Kd)
+K3 = Kd
 e = 0
 e1 = 0
 e2 = 0
+u_prev = SP
+# Should play around with what to originally set e1, e2, and u_prev
 
-on = 1
+lower = SP - thresh
+upper = SP + thresh
 
-while on:
-    # Reset error values:
-    e2 = e1
-    e1 = e
-    u_prev = u
+count = 0
 
-    act_ana, act_voltage, act_meas = read_ads1115(0)
-    # This command will be changed to fit with the function definition in adctest.py
+for i in range(100):
+        act_ana, act_voltage, act_meas = read_ads1115(0)
+        # This command will be changed to fit with the function definition in adctest.py
 
-    e = SP - act_meas
+        if act_meas > lower and act_meas < upper:
+            count = count + 1
+        else:
+            count = 0
 
-    u = u_prev + (e*k1) + (e1*k2) + (e2*k3)
+        if count >= 10:
+            print("breaked")
+            break
 
-    if act_meas < SP
+        if act_meas >= offset + 6 or act_meas < offset:
+            break
 
-    write_pwm(u,SP)
-    # This command will also be changed to fit with the function definition in adctest.py
 
-    time.sleep(Ts-0.002)
+        if SP > offset + 6:
+            SP = offset + 6
+        if SP < offset:
+            SP = offset
 
-    # Exit if within threshold
-    if (u>lower) & (u<upper):
-        on = 0
+	# Added e1, e2, u_prev
+	e2 = e1
+	e1 = e
+	u_prev = u
+
+        e = SP - act_meas
+
+	# Different u calculation
+        u = u_prev + (K1*e) + (K2*e1) + (K3*e2)
+
+        write_pwm(u,pin_ext, pin_ret)
+        # This command will also be changed to fit with the function definition in adctest.py
+
+        time.sleep(Ts)
+
+pin_ext.value = 0
+pin_ret.value = 0
+pin_ext.off()
+pin_ret.off()
