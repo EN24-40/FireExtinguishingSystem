@@ -5,7 +5,6 @@ from gpiozero import PWMLED
 import time
 import smbus
 import math
-import matplotlib.pyplot as plt
 
 # Set PWM pins
 pin_ret = PWMLED(20)
@@ -102,4 +101,4 @@ class MyController(Controller):
 
 # Controller specific code from Github
 controller = MyController(interface="/dev/input/js0", connecting_using_ds4drv=False)
-controller.listen(timeout=60)
+controller.listen()
