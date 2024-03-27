@@ -132,9 +132,9 @@ int main( int argc, char **argv )
 	thread->useColormap(typeColormap);
 	thread->useLepton(typeLepton);
 	thread->useSpiSpeedMhz(spiSpeed);
-	//thread->setAutomaticScalingRange();
-	//if (0 <= rangeMin) thread->useRangeMinValue(rangeMin);
-	//if (0 <= rangeMax) thread->useRangeMaxValue(rangeMax);
+	// thread->setAutomaticScalingRange();
+	// if (0 <= rangeMin) thread->useRangeMinValue(rangeMin);
+	// if (0 <= rangeMax) thread->useRangeMaxValue(rangeMax);
 	rangeMin = 27315;
 	rangeMax = 30537;
 	thread->useRangeMinValue(rangeMin);
