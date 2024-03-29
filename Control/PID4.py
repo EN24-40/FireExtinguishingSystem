@@ -1,5 +1,17 @@
-import smbus
+from gpiozero import PWMLED
 import time
+import smbus
+import math
+import matplotlib.pyplot as plt
+
+# Set PWM pins
+pin_pwm = PWMLED(20)
+pin_dir = PWMLED(21)
+
+offset = 1.25
+
+data = []
+times = []
 
 # ADS1115 default address
 ADS1115_ADDRESS = 0x48
@@ -56,6 +68,7 @@ def read_ads1115(channel):
     min_value = 0
     max_value = 0
     offset = 0
+    stroke = 0
 
     if channel == 0:
         min_value = 950
@@ -77,9 +90,104 @@ def read_ads1115(channel):
 
     return value, voltage, inches
 
-# Loop to read the analog input continuously
-while True:
-    analog_value, voltage, inches = read_ads1115(1)  # Reading from channel 0
- 
-    print("Analog Value: ", analog_value, "Voltage: ", round(voltage, 3), "Inches: ", round(inches, 3))
-    time.sleep(0.2)
+def write_pwm(u, pin_p, pin_d):
+    d = 0
+    if u < 0:
+        d = 1
+    
+    pin_d.value = d
+
+    u_s = abs(u)
+
+    if u_s > 1:
+        u_s = 1
+    
+    pin_p.value = u_s
+        
+# Sample Parameters (will be changed before and after tuning)
+# Testing had Ku = 12, with Tu = 0.2
+Kp = 7.2    #0.6*Ku
+Ki = 72		#Kp/0.5*Tu
+Kd = 0.18      #0.125*Kp*Tu
+
+# PID Specific Parameters
+integral = 0
+deriv = 0
+
+Ts = 0.05
+SP = float(input("set point (in): "))
+thresh = 0.002
+
+lower = SP - thresh
+upper = SP + thresh
+
+e = 0
+e_prev = 0
+
+count = 0
+
+start_time = time.time()
+act_meas = 0
+
+for i in range(200):
+        prev_meas = act_meas
+        act_ana, act_voltage, act_meas = read_ads1115(1)
+        # This command will be changed to fit with the function definition in adctest.py
+
+        if ((prev_meas > SP) and (act_meas < SP)) or ((prev_meas < SP) and (act_meas > SP)):
+            print("cross time = ", time.time()-start_time)
+
+        if act_meas > lower and act_meas < upper:
+            count = count + 1
+        else:
+            count = 0
+
+        if count >= 20:
+            print("breaked")
+            break
+
+        if act_meas >= offset + 6 or act_meas < offset:
+            break
+
+
+        if SP > offset + 6:
+            SP = offset + 6
+        if SP < offset:
+            SP = offset
+
+        e_prev = e		# Added
+
+        e = SP - act_meas
+
+        # Added PID Specific Code
+        integral += e * Ts
+        deriv = (e - e_prev) / Ts
+
+        data.append(act_meas)
+        times.append(time.time() - start_time)
+
+        u = Kp * e
+
+        write_pwm(u,pin_pwm, pin_dir)
+
+        time.sleep(Ts)
+
+pin_dir.value = 0
+pin_pwm.value = 0
+pin_dir.off()
+pin_pwm.off()
+
+plt.title(f"Step Response of Linear Actuator, Kp = {Kp}, Ki = {Ki}, Kd = {Kd}")
+plt.ylabel("Length (in)")
+plt.xlabel("Time (sec)")
+plt.plot(times, data, linewidth=1.0)
+plt.savefig("stepresponse.png")
+
+
+plt.title(f"Step Response of Linear Actuator, Kp = {Kp}, Ki = {Ki}, Kd = {Kd}")
+plt.ylabel("Length (in)")
+plt.xlabel("Time (sec)")
+plt.plot(times, data, linewidth=1.0)
+plt.ylim([SP-0.05, SP+0.05])
+plt.xlim([times[math.floor(len(times)/2)],times[len(times)-1]])
+plt.savefig("stepresponsezoom.png")
