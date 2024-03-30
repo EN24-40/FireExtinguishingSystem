@@ -6,8 +6,8 @@ warnings.filterwarnings("ignore")
 cv2.namedWindow("preview")
 #cv2.namedWindow("preview2")
 
-raw_img_path = "/home/remote/FireDetection/rawframes/Sample_Capture_130.tiff"
-img_path = "/home/remote/FireDetection/cleanframes/undistorted_Sample_Capture_130.tiff"
+raw_img_path = "/home/remote/FireDetection/rawframes/Sample_Capture_15.tiff"
+img_path = "/home/remote/FireDetection/cleanframes/undistorted_Sample_Capture_15.tiff"
 
 raw_frame = cv2.imread(raw_img_path)
 frame = cv2.imread(img_path)
@@ -16,7 +16,7 @@ undistorted_frame = frame
 frame_v = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)[:,:,2]
 
 blurredBrightness = cv2.bilateralFilter(frame_v, 9, 150, 150)
-thresh = 50
+thresh = 5
 edges = cv2.Canny(blurredBrightness, thresh, thresh*2, L2gradient=True)
 
 _, mask = cv2.threshold(blurredBrightness, 200, 1, cv2.THRESH_BINARY)

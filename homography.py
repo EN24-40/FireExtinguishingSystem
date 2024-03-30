@@ -22,7 +22,7 @@ inv_h = np.linalg.inv(h)
 
 
 #a loop for testing many spots if wanted.
-multiple_value_testing = True
+multiple_value_testing = False
 
 if multiple_value_testing == True:
 
@@ -70,8 +70,8 @@ if multiple_value_testing == True:
 else:   # In the case of else, a single point can be input and used. Automation uses this.
 
     #putting the hotspot in an array
-    spot = np.array([[150],
-                    [70], 
+    spot = np.array([[-12],
+                    [80], 
                     [1]])
 
     prod = np.dot(inv_h, spot)
