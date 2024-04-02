@@ -6,11 +6,11 @@ import cv2
 
 
 # Points in source (real world coordinates)
-# Bret under hoop, back corner of house, Connor near garage, Connor bottom right corner
-pts_src = np.array([[-15.666, 1,1], [-15.666, 40,1], [5, 23,1], [15, 1, 1]]) # in FT 
+# 1-4,10,7,6,8
+pts_src = np.array([[0, 15,1], [-8.5, 6.9,1], [15.1, 6.9,1],[-9.3,15.4,1], [-9.3, 40.8, 1],[8.3,20.8,1],[21.5,15,1],[0,37.6,1]]) # in FT 
 
 # Points in camera image (pixels)
-pts_dst = np.array([[-126, 65,1], [-126, 154, 1], [14, 131, 1], [140, 60, 1]])  # in Pixels
+pts_dst = np.array([[-5, 76,1], [-114, 15, 1], [133, 15, 1],[-70,78,1], [-39, 130, 1],[44,100,1],[128,77,1],[-1,136,1]])  # in Pixels
 
 # Calculate H in homography equation
 h, status = cv2.findHomography(pts_src, pts_dst)
@@ -70,8 +70,8 @@ if multiple_value_testing == True:
 else:   # In the case of else, a single point can be input and used. Automation uses this.
 
     #putting the hotspot in an array
-    spot = np.array([[-12],
-                    [80], 
+    spot = np.array([[-1],
+                    [101], 
                     [1]])
 
     prod = np.dot(inv_h, spot)
