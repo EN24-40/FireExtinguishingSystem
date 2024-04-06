@@ -9,8 +9,10 @@ import matplotlib.pyplot as plt
 pygame.init()
 pygame.joystick.init()
 
-pin_pwm = PWMLED(20)
-pin_dir = PWMLED(21)
+yaw_pwm = PWMLED(20)
+yaw_dir = PWMLED(21)
+pitch_pwm = PWMLED(19)
+pitch_dir = PWMLED(26)
 
 def write_pwm(u, pin_p, pin_d):
     d = 0
@@ -47,9 +49,15 @@ while running:
     # Get the left stick's horizontal movement
     left_stick_horizontal = joystick.get_axis(0)
     if abs(left_stick_horizontal) > 0.3:
-        write_pwm(left_stick_horizontal, pin_pwm, pin_dir)
+        write_pwm(left_stick_horizontal, yaw_pwm, yaw_dir)
     else:
-        write_pwm(0, pin_pwm, pin_dir)
+        write_pwm(0, yaw_pwm, yaw_dir)
+
+    right_stick_vertical = joystick.get_axis(3)
+    if abs(right_stick_vertical) > 0.3 and abs(left_stick_horizontal) < 0.3:
+        write_pwm(right_stick_vertical, pitch_pwm, pitch_dir)
+    else:
+        write_pwm(0, pitch_pwm, pitch_dir)
     
     time.sleep(0.1)
 
