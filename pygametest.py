@@ -49,13 +49,13 @@ while running:
     # Get the left stick's horizontal movement
     left_stick_horizontal = joystick.get_axis(0)
     if abs(left_stick_horizontal) > 0.3:
-        write_pwm(left_stick_horizontal, yaw_pwm, yaw_dir)
+        write_pwm(-left_stick_horizontal, yaw_pwm, yaw_dir)
     else:
         write_pwm(0, yaw_pwm, yaw_dir)
 
     right_stick_vertical = joystick.get_axis(3)
     if abs(right_stick_vertical) > 0.3 and abs(left_stick_horizontal) < 0.3:
-        write_pwm(right_stick_vertical, pitch_pwm, pitch_dir)
+        write_pwm(-right_stick_vertical, pitch_pwm, pitch_dir)
     else:
         write_pwm(0, pitch_pwm, pitch_dir)
     
@@ -66,4 +66,6 @@ while running:
             running = False
 
 # Quit Pygame
+write_pwm(0, yaw_pwm, yaw_dir)
+write_pwm(0, pitch_pwm, pitch_dir)
 pygame.quit()
