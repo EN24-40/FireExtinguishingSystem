@@ -13,6 +13,14 @@
 #include "LeptonThread.h"
 #include "MyLabel.h"
 
+//for web application
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QBuffer>
+#include <QDebug>
+//#include <QWebView>
+
 void printUsage(char *cmd) {
         char *cmdname = basename(cmd);
 	printf("Usage: %s [OPTION]...\n"
@@ -37,6 +45,34 @@ void printUsage(char *cmd) {
                " -d x    log level (0-255)\n"
                "", cmdname, cmdname);
 	return;
+}
+// funtion for web application
+void sendImageToServer(const QImage &image)
+{
+   QNetworkAccessManager manager;
+    QUrl url("http://10.0.0.151/var/www/html/upload.php");  // Update with your server URL
+    QNetworkRequest request(url);
+
+    // Convert QImage to byte array
+    QByteArray imageData;
+    QBuffer buffer(&imageData);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "PNG");  // Save QImage as PNG to byte array
+
+    // Set content type and POST image data to server
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "image/png");  // Set correct content type
+    QNetworkReply *reply = manager.post(request, imageData);
+
+    // Handle server response
+    QObject::connect(reply, &QNetworkReply::finished, [=]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            qDebug() << "Image uploaded successfully!";
+            qDebug() << "Server response:" << reply->readAll();  // Optionally read server response
+        } else {
+            qDebug() << "Error uploading image:" << reply->errorString();
+        }
+        reply->deleteLater();
+    });
 }
 
 int main( int argc, char **argv )
@@ -153,10 +189,16 @@ int main( int argc, char **argv )
         // capture the frame
         QImage capturedImage = myLabel.pixmap()->toImage();  // Assuming myLabel has a valid pixmap
 
+		 //web application
+		sendImageToServer(capturedImage);
+
         // save the captured frame as a .tiff file
         QString fileName = QString("/home/remote/FireDetection/rawframes/Sample_Capture_%1.tiff").arg(frameCounter++);
         capturedImage.save(fileName, "TIFF");
     });
+	//web app
+	//QWebView webView;
+   // webView.load(QUrl("http://10.0.0.151/index.html"));   webView.show();
 
 	captureTimer.start();
 	

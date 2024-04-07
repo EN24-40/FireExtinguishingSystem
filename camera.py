@@ -2,7 +2,7 @@ import cv2
 import numpy
 from flask import Flask, render_template, Response, stream_with_context, request
 
-video = cv2.VideoCapture(0)
+video = cv2.VideoCapture(31)
 app = Flask('__name__')
 
 
@@ -19,7 +19,7 @@ def video_stream():
 
 @app.route('/camera')
 def camera():
-    return render_template('camera.html')
+    return render_template('index.html')
 
 
 @app.route('/video_feed')
