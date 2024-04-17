@@ -136,12 +136,12 @@ h_sys = 17.625 	# in
 pipe_diamter_inlet = 3 	# in
 nozzel_diamter = 1.5 		# in
 
-p1 = 10 * 144  	# [lb/ft^2] 
+p1 = 25 * 144  	# [lb/ft^2] 
 # Given supply pressure, need to verify with fire department what that will be. Assumed 10 psi for now
 
 p2 = 0 * 144  	# [lb/ft^2] outlet atmospheric pressure
 friction_losses = 2.2 / 144  # [lb/ft^2] Friction losses in system
-y = 100 * 0.3048  	# [m] height of turret
+y = 0 * 0.3048  	# [m] height of turret
 
 # Calculations
 
@@ -199,159 +199,158 @@ angle_yaw = math.degrees(math.atan(side_distance/forward_distance))
 
 print("yaw: ", round(angle_yaw, 3))
 
-# if angle_pitch >= -40 and angle_pitch <= 36:
-#     SP_pitch = 0.0499 * angle_pitch + 5.4249
-# else:
-#     SP_pitch = 5.4249
-# print(SP_pitch)
+if angle_pitch >= -40 and angle_pitch <= 36:
+    SP_pitch = 0.0499 * angle_pitch + 5.4249
+else:
+    SP_pitch = 5.4249
+print(SP_pitch)
 
-# angle_yaw = float(input("yaw angle (degrees): "))
-# if angle_yaw >= -31 and angle_yaw <= 43:
-#     SP_yaw = -0.0517 * angle_yaw + 4.0909
-# else:
-#     SP_yaw = 3.9949
-# print(SP_yaw)
-
+if angle_yaw >= -31 and angle_yaw <= 43:
+    SP_yaw = -0.0517 * angle_yaw + 4.0909
+else:
+    SP_yaw = 3.9949
+print(SP_yaw)
 
 
-# thresh = 0.002
-# lower = SP_pitch - thresh
-# upper = SP_pitch + thresh
 
-# e = 0
-# e_prev = 0
+thresh = 0.002
+lower = SP_pitch - thresh
+upper = SP_pitch + thresh
 
-# count = 0
+e = 0
+e_prev = 0
 
-# start_time = time.time()
-# act_meas = 0
+count = 0
 
-# for i in range(200):
-#         prev_meas = act_meas
-#         act_dig, act_voltage, act_meas = read_ads1115(1)
-#         # This command will be changed to fit with the function definition in adctest.py
+start_time = time.time()
+act_meas = 0
 
-#         if ((prev_meas > SP_pitch) and (act_meas < SP_pitch)) or ((prev_meas < SP_pitch) and (act_meas > SP_pitch)):
-#             print("cross time = ", time.time()-start_time)
+for i in range(200):
+        prev_meas = act_meas
+        act_dig, act_voltage, act_meas = read_ads1115(1)
+        # This command will be changed to fit with the function definition in adctest.py
 
-
-#         if act_meas > lower and act_meas < upper:
-#             count = count + 1
-#         else:
-#             count = 0
-
-#         if count >= 20:
-#             print("breaked")
-#             break
-
-#         if act_meas >= offset + 6 or act_meas < offset:
-#             break
+        if ((prev_meas > SP_pitch) and (act_meas < SP_pitch)) or ((prev_meas < SP_pitch) and (act_meas > SP_pitch)):
+            print("cross time = ", time.time()-start_time)
 
 
-#         if SP_pitch > offset + 6:
-#             SP_pitch = offset + 6
-#         if SP_pitch < offset:
-#             SP_pitch = offset
+        if act_meas > lower and act_meas < upper:
+            count = count + 1
+        else:
+            count = 0
 
-#         e_prev = e		# Added
+        if count >= 20:
+            print("breaked")
+            break
 
-#         e = SP_pitch - act_meas
-
-#         # Added PID Specific Code
-#         integral += e * Ts
-#         deriv = (e - e_prev) / Ts
-
-#         data.append(act_meas)
-#         times.append(time.time() - start_time)
-
-#         u = Kp * e
-
-#         write_pwm(u,pitch_pwm, pitch_dir)
-
-#         time.sleep(Ts)
-
-# pitch_dir.value = 0
-# pitch_pwm.value = 0
-# pitch_dir.off()
-# pitch_pwm.off()
-
-# time.sleep(0.5)
-
-# thresh = 0.002
-
-# lower = SP_yaw - thresh
-# upper = SP_yaw + thresh
-
-# e = 0
-# e_prev = 0
-# integral = 0
-# deriv = 0
-
-# count = 0
-
-# start_time = time.time()
-# act_meas = 0
-
-# for i in range(200):
-#         prev_meas = act_meas
-#         act_dig, act_voltage, act_meas = read_ads1115(0)
-#         # This command will be changed to fit with the function definition in adctest.py
-
-#         if ((prev_meas > SP_yaw) and (act_meas < SP_yaw)) or ((prev_meas < SP_yaw) and (act_meas > SP_yaw)):
-#             print("cross time = ", time.time()-start_time)
+        if act_meas >= offset + 6 or act_meas < offset:
+            break
 
 
-#         if act_meas > lower and act_meas < upper:
-#             count = count + 1
-#         else:
-#             count = 0
+        if SP_pitch > offset + 6:
+            SP_pitch = offset + 6
+        if SP_pitch < offset:
+            SP_pitch = offset
 
-#         if count >= 20:
-#             print("breaked")
-#             break
+        e_prev = e		# Added
 
-#         if act_meas >= offset + 6 or act_meas < offset:
-#             break
+        e = SP_pitch - act_meas
+
+        # Added PID Specific Code
+        integral += e * Ts
+        deriv = (e - e_prev) / Ts
+
+        data.append(act_meas)
+        times.append(time.time() - start_time)
+
+        u = Kp * e
+
+        write_pwm(u,pitch_pwm, pitch_dir)
+
+        time.sleep(Ts)
+
+pitch_dir.value = 0
+pitch_pwm.value = 0
+pitch_dir.off()
+pitch_pwm.off()
+
+time.sleep(0.5)
+
+thresh = 0.002
+
+lower = SP_yaw - thresh
+upper = SP_yaw + thresh
+
+e = 0
+e_prev = 0
+integral = 0
+deriv = 0
+
+count = 0
+
+start_time = time.time()
+act_meas = 0
+
+for i in range(200):
+        prev_meas = act_meas
+        act_dig, act_voltage, act_meas = read_ads1115(0)
+        # This command will be changed to fit with the function definition in adctest.py
+
+        if ((prev_meas > SP_yaw) and (act_meas < SP_yaw)) or ((prev_meas < SP_yaw) and (act_meas > SP_yaw)):
+            print("cross time = ", time.time()-start_time)
 
 
-#         if SP_yaw > offset + 6:
-#             SP_yaw = offset + 6
-#         if SP_yaw < offset:
-#             SP_yaw = offset
+        if act_meas > lower and act_meas < upper:
+            count = count + 1
+        else:
+            count = 0
 
-#         e_prev = e		# Added
+        if count >= 20:
+            print("breaked")
+            break
 
-#         e = SP_yaw - act_meas
-
-#         # Added PID Specific Code
-#         integral += e * Ts
-#         deriv = (e - e_prev) / Ts
-
-#         data.append(act_meas)
-#         times.append(time.time() - start_time)
-
-#         u = Kp * e
-
-#         write_pwm(u,yaw_pwm, yaw_dir)
-
-#         time.sleep(Ts)
-
-# yaw_dir.value = 0
-# yaw_pwm.value = 0
-# yaw_dir.off()
-# yaw_pwm.off()
-
-# # plt.title(f"Step Response of Linear Actuator, Kp = {Kp}, Ki = {Ki}, Kd = {Kd}")
-# # plt.ylabel("Length (in)")
-# # plt.xlabel("Time (sec)")
-# # plt.plot(times, data, linewidth=1.0)
-# # plt.savefig("stepresponse.png")
+        if act_meas >= offset + 6 or act_meas < offset:
+            break
 
 
-# # plt.title(f"Step Response of Linear Actuator, Kp = {Kp}, Ki = {Ki}, Kd = {Kd}")
-# # plt.ylabel("Length (in)")
-# # plt.xlabel("Time (sec)")
-# # plt.plot(times, data, linewidth=1.0)
-# # plt.ylim([SP-0.05, SP+0.05])
-# # plt.xlim([times[math.floor(len(times)/2)],times[len(times)-1]])
-# # plt.savefig("stepresponsezoom.png")
+        if SP_yaw > offset + 6:
+            SP_yaw = offset + 6
+        if SP_yaw < offset:
+            SP_yaw = offset
+
+        e_prev = e		# Added
+
+        e = SP_yaw - act_meas
+
+        # Added PID Specific Code
+        integral += e * Ts
+        deriv = (e - e_prev) / Ts
+
+        data.append(act_meas)
+        times.append(time.time() - start_time)
+
+        u = Kp * e
+
+        write_pwm(u,yaw_pwm, yaw_dir)
+
+        time.sleep(Ts)
+
+yaw_dir.value = 0
+yaw_pwm.value = 0
+yaw_dir.off()
+yaw_pwm.off()
+
+# plt.title(f"Step Response of Linear Actuator, Kp = {Kp}, Ki = {Ki}, Kd = {Kd}")
+# plt.ylabel("Length (in)")
+# plt.xlabel("Time (sec)")
+# plt.plot(times, data, linewidth=1.0)
+# plt.savefig("stepresponse.png")
+
+
+# plt.title(f"Step Response of Linear Actuator, Kp = {Kp}, Ki = {Ki}, Kd = {Kd}")
+# plt.ylabel("Length (in)")
+# plt.xlabel("Time (sec)")
+# plt.plot(times, data, linewidth=1.0)
+# plt.ylim([SP-0.05, SP+0.05])
+# plt.xlim([times[math.floor(len(times)/2)],times[len(times)-1]])
+# plt.savefig("stepresponsezoom.png")

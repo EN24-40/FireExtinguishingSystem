@@ -81,7 +81,7 @@ def read_ads1115(channel):
 
 # Loop to read the digital input continuously
 while True:
-    digital_value, voltage, inches = read_ads1115(0)  # Reading from channel 0
+    digital_value, voltage, inches = read_ads1115(1)  # Reading from channel 0
  
     print("digital Value: ", digital_value, "Voltage: ", round(voltage, 3), "Inches: ", round(inches, 3))
     time.sleep(0.2)
