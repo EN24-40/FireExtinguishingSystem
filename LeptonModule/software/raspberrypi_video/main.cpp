@@ -12,13 +12,14 @@
 
 #include "LeptonThread.h"
 #include "MyLabel.h"
+#include <cstdlib>
 
 //for web application
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QBuffer>
-#include <QDebug>
+// #include <QNetworkAccessManager>
+// #include <QNetworkRequest>
+// #include <QNetworkReply>
+// #include <QBuffer>
+// #include <QDebug>
 //#include <QWebView>
 
 void printUsage(char *cmd) {
@@ -47,33 +48,33 @@ void printUsage(char *cmd) {
 	return;
 }
 // funtion for web application
-void sendImageToServer(const QImage &image)
-{
-   QNetworkAccessManager manager;
-    QUrl url("http://10.0.0.151/var/www/html/upload.php");  // Update with your server URL
-    QNetworkRequest request(url);
+// void sendImageToServer(const QImage &image)
+// {
+//    QNetworkAccessManager manager;
+//     QUrl url("http://10.0.0.151/var/www/html/upload.php");  // Update with your server URL
+//     QNetworkRequest request(url);
 
-    // Convert QImage to byte array
-    QByteArray imageData;
-    QBuffer buffer(&imageData);
-    buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, "PNG");  // Save QImage as PNG to byte array
+//     // Convert QImage to byte array
+//     QByteArray imageData;
+//     QBuffer buffer(&imageData);
+//     buffer.open(QIODevice::WriteOnly);
+//     image.save(&buffer, "PNG");  // Save QImage as PNG to byte array
 
-    // Set content type and POST image data to server
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "image/png");  // Set correct content type
-    QNetworkReply *reply = manager.post(request, imageData);
+//     // Set content type and POST image data to server
+//     request.setHeader(QNetworkRequest::ContentTypeHeader, "image/png");  // Set correct content type
+//     QNetworkReply *reply = manager.post(request, imageData);
 
-    // Handle server response
-    QObject::connect(reply, &QNetworkReply::finished, [=]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            qDebug() << "Image uploaded successfully!";
-            qDebug() << "Server response:" << reply->readAll();  // Optionally read server response
-        } else {
-            qDebug() << "Error uploading image:" << reply->errorString();
-        }
-        reply->deleteLater();
-    });
-}
+//     // Handle server response
+//     QObject::connect(reply, &QNetworkReply::finished, [=]() {
+//         if (reply->error() == QNetworkReply::NoError) {
+//             qDebug() << "Image uploaded successfully!";
+//             qDebug() << "Server response:" << reply->readAll();  // Optionally read server response
+//         } else {
+//             qDebug() << "Error uploading image:" << reply->errorString();
+//         }
+//         reply->deleteLater();
+//     });
+// }
 
 int main( int argc, char **argv )
 {
@@ -172,7 +173,7 @@ int main( int argc, char **argv )
 	// if (0 <= rangeMin) thread->useRangeMinValue(rangeMin);
 	// if (0 <= rangeMax) thread->useRangeMaxValue(rangeMax);
 	rangeMin = 27315;
-	rangeMax = 30537;
+	rangeMax = 31092;
 	thread->useRangeMinValue(rangeMin);
 	thread->useRangeMaxValue(rangeMax);
 	QObject::connect(thread, SIGNAL(updateImage(QImage)), &myLabel, SLOT(setImage(QImage)));
@@ -182,7 +183,7 @@ int main( int argc, char **argv )
 	thread->start();
 
 	QTimer captureTimer;
-    captureTimer.setInterval(1000);
+    captureTimer.setInterval(2000);
 	int frameCounter = 0;
 
 	QObject::connect(&captureTimer, &QTimer::timeout, [&]() {
@@ -190,17 +191,29 @@ int main( int argc, char **argv )
         QImage capturedImage = myLabel.pixmap()->toImage();  // Assuming myLabel has a valid pixmap
 
 		 //web application
-		sendImageToServer(capturedImage);
+		//sendImageToServer(capturedImage);
 
         // save the captured frame as a .tiff file
         QString fileName = QString("/home/remote/FireDetection/rawframes/Sample_Capture_%1.tiff").arg(frameCounter++);
+		QString liveFileName = QString("/home/remote/FireDetection/rawframes/Live_Capture.tiff");
         capturedImage.save(fileName, "TIFF");
+		capturedImage.save(liveFileName, "TIFF");
+		system("python3 /home/remote/FireDetection/LeptonModule/software/raspberrypi_video/dewarp/liveDewarp.py &");
     });
 	//web app
 	//QWebView webView;
    // webView.load(QUrl("http://10.0.0.151/index.html"));   webView.show();
 
+   QTimer repaintTimer;
+	repaintTimer.setInterval(1000); // Adjust the interval as needed
+	QObject::connect(&repaintTimer, &QTimer::timeout, [&]() {
+    	myLabel.update(); // Force repaint of the label widget
+	});
+	repaintTimer.start();
+
 	captureTimer.start();
+
+	thread->performFFC();
 	
 	myWidget->show();
 
