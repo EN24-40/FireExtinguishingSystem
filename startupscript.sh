@@ -5,4 +5,4 @@ cd LeptonModule/software/raspberrypi_video
 make
 sudo cp ~/.Xauthority /root
 sudo ./raspberrypi_video -tl 3 -cm 2
-sudo ./undistorframes.sh
+cd /home/remote/FireDetection

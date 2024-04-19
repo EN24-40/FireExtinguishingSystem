@@ -166,3 +166,4 @@ if os.path.isfile(input_file_path):
     # result.set_title("undistorted")
     # plt.axis('off')
     #plt.show()
+exit()

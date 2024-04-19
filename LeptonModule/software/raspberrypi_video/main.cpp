@@ -173,7 +173,7 @@ int main( int argc, char **argv )
 	// if (0 <= rangeMin) thread->useRangeMinValue(rangeMin);
 	// if (0 <= rangeMax) thread->useRangeMaxValue(rangeMax);
 	rangeMin = 27315;
-	rangeMax = 31092;
+	rangeMax = 34643;
 	thread->useRangeMinValue(rangeMin);
 	thread->useRangeMaxValue(rangeMax);
 	QObject::connect(thread, SIGNAL(updateImage(QImage)), &myLabel, SLOT(setImage(QImage)));

@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
+import sys
+sys.path.insert(1, '/home/remote/FireDetection')
+import homography as hg
 
 def liveHotspot():
 
@@ -31,6 +34,8 @@ def liveHotspot():
                 cv2.circle(frame, (cX, cY), 2, (0, 0, 255), -1)  # Draw a red dot
                 print("FireDetected")
                 print("X: " + str(cX) + "| Y: " + str(cY))
+                hg.homography(cX, cY)
+    return
 
     # Display the result
     # cv2.imshow("Red Areas", frame)
