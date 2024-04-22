@@ -1,9 +1,9 @@
 import subprocess
 import numpy as np
 import cv2  # OpenCV for image handling
-from pylepton import Lepton
+from pylepton import Lepton            ## Try changing this library
 
-device = "/dev/spidev0.0"    # Enable SPI interface first and check if camera is at 0.0 or 0.1
+device = "/dev/spidev0.0"              ## Enable SPI interface first and check if camera is at 0.0 or 0.1
 with Lepton(device) as l:
     while True:
         _, frame = l.capture()
@@ -15,5 +15,6 @@ with Lepton(device) as l:
         frame = cv2.applyColorMap(frame, cv2.COLORMAP_JET)
         # Write the frame to stdout
         frame_bytes = frame.tobytes()
-      # Change destination IP and port below
+        
+        ## Change destination IP and port below
         subprocess.call(['ffmpeg', '-i', '-', '-f', 'mpegts', 'udp://<destination IP>:<port>'], stdin=subprocess.PIPE).communicate(input=frame_bytes)
