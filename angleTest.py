@@ -112,9 +112,9 @@ def write_pwm(u, pin_p, pin_d):
         
 # Sample Parameters (will be changed before and after tuning)
 # Testing had Ku = 12, with Tu = 0.2
-Kp = 7.2    #0.6*Ku
-Ki = 72		#Kp/0.5*Tu
-Kd = 0.18      #0.125*Kp*Tu
+Kp = 7.2        #0.6*Ku
+Ki = 0.1		#0.5*Tu
+Kd = 0.025       #0.125*Tu
 
 # PID Specific Parameters
 integral = 0
@@ -135,7 +135,7 @@ else:
     SP_yaw = 3.9949
 print(SP_yaw)
 
-thresh = 0.002
+thresh = 0.01
 lower = SP_pitch - thresh
 upper = SP_pitch + thresh
 
@@ -147,7 +147,7 @@ count = 0
 start_time = time.time()
 act_meas = 0
 
-for i in range(200):
+for i in range(100):
         prev_meas = act_meas
         act_dig, act_voltage, act_meas = read_ads1115(1)
         # This command will be changed to fit with the function definition in adctest.py
@@ -161,7 +161,7 @@ for i in range(200):
         else:
             count = 0
 
-        if count >= 20:
+        if count >= 10:
             print("breaked")
             break
 
@@ -185,7 +185,8 @@ for i in range(200):
         data.append(act_meas)
         times.append(time.time() - start_time)
 
-        u = Kp * e
+        # u = Kp * e
+        u = (Kp*e) + (Ki*integral) + (Kd*deriv)
 
         write_pwm(u,pitch_pwm, pitch_dir)
 
@@ -197,8 +198,6 @@ pitch_dir.off()
 pitch_pwm.off()
 
 time.sleep(0.5)
-
-thresh = 0.002
 
 lower = SP_yaw - thresh
 upper = SP_yaw + thresh
@@ -213,7 +212,7 @@ count = 0
 start_time = time.time()
 act_meas = 0
 
-for i in range(200):
+for i in range(100):
         prev_meas = act_meas
         act_dig, act_voltage, act_meas = read_ads1115(0)
         # This command will be changed to fit with the function definition in adctest.py
@@ -227,7 +226,7 @@ for i in range(200):
         else:
             count = 0
 
-        if count >= 20:
+        if count >= 10:
             print("breaked")
             break
 
@@ -248,10 +247,9 @@ for i in range(200):
         integral += e * Ts
         deriv = (e - e_prev) / Ts
 
-        data.append(act_meas)
-        times.append(time.time() - start_time)
+        # u = Kp * e
 
-        u = Kp * e
+        u = (Kp*e) + (Ki*integral) + (Kd*deriv)
 
         write_pwm(u,yaw_pwm, yaw_dir)
 
@@ -265,6 +263,8 @@ yaw_pwm.off()
 # plt.title(f"Step Response of Linear Actuator, Kp = {Kp}, Ki = {Ki}, Kd = {Kd}")
 # plt.ylabel("Length (in)")
 # plt.xlabel("Time (sec)")
+# data = data[1:]
+# times = times[1:]
 # plt.plot(times, data, linewidth=1.0)
 # plt.savefig("stepresponse.png")
 
@@ -273,6 +273,6 @@ yaw_pwm.off()
 # plt.ylabel("Length (in)")
 # plt.xlabel("Time (sec)")
 # plt.plot(times, data, linewidth=1.0)
-# plt.ylim([SP-0.05, SP+0.05])
+# plt.ylim([SP_pitch-0.05, SP_pitch+0.05])
 # plt.xlim([times[math.floor(len(times)/2)],times[len(times)-1]])
 # plt.savefig("stepresponsezoom.png")
