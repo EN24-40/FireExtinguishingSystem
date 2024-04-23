@@ -251,11 +251,18 @@ void LeptonThread::run()
 				//
 				value = (valueFrameBuffer - minValue) * scale;
 
-				
-				int ofs_r = 3 * value + 0; if (colormapSize <= ofs_r) ofs_r = colormapSize - 1;
-				int ofs_g = 3 * value + 1; if (colormapSize <= ofs_g) ofs_g = colormapSize - 1;
-				int ofs_b = 3 * value + 2; if (colormapSize <= ofs_b) ofs_b = colormapSize - 1;
-				color = qRgb(colormap[ofs_r], colormap[ofs_g], colormap[ofs_b]);
+				int overflow_flag = 0;
+				int ofs_r = 3 * value + 0; if (colormapSize <= ofs_r) overflow_flag = 1; //ofs_r = colormapSize - 1;
+				int ofs_g = 3 * value + 1; if (colormapSize <= ofs_g) overflow_flag = 1; //ofs_g = colormapSize - 1;
+				int ofs_b = 3 * value + 2; if (colormapSize <= ofs_b) overflow_flag = 1; //ofs_b = colormapSize - 1;
+
+				if(overflow_flag){
+					color = qRgb(255, 0, 0);
+				}
+				else{
+					color = qRgb(colormap[ofs_r], colormap[ofs_g], colormap[ofs_b]);
+				}
+
 				if (typeLepton == 3) {
 					column = (i % PACKET_SIZE_UINT16) - 2 + (myImageWidth / 2) * ((i % (PACKET_SIZE_UINT16 * 2)) / PACKET_SIZE_UINT16);
 					row = i / PACKET_SIZE_UINT16 / 2 + ofsRow;
