@@ -263,7 +263,7 @@ for i in range(100):
         data.append(act_meas)
         times.append(time.time() - start_time)
 
-        # u = Kp * e
+        # u = Kp * e            # For P controller
         u = (Kp*e) + (Ki*integral) + (Kd*deriv)
 
         write_pwm(u,pitch_pwm, pitch_dir)
