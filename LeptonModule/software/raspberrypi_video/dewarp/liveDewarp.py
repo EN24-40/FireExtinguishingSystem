@@ -127,6 +127,7 @@ if __name__ == "__main__":
     input_folder = '/home/remote/FireDetection/rawframes'
     output_folder = '/home/remote/FireDetection/cleanframes'
     filename = 'Live_Capture.tiff'
+    webapp_filename = 'Live_Capture.jpg'
 
     input_file_path = os.path.join(input_folder, filename)
 
@@ -152,8 +153,11 @@ if os.path.isfile(input_file_path):
     # Save the undistorted image to the output folder
     output_file_path = os.path.join(output_folder, f"undistorted_{filename}")
     cv2.imwrite(output_file_path, undistorted_img)
+    webapp_output_file_path = os.path.join("/var/www/html", f"undistorted_{webapp_filename}")
+    cv2.imwrite(webapp_output_file_path, undistorted_img)
     # os.system("python3 /home/remote/FireDetection/liveHotspot.py &")
     lh.liveHotspot()
+    exit()
 
     # Display original and corrected images side by side
     # fig = plt.figure()
