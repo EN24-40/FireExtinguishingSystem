@@ -57,13 +57,15 @@ def read_ads1115(channel):
     max_value = 0
     offset = 0
 
-    if channel == 0:
+    #M2, Pitch
+    if channel == 1:
         min_value = 950
         max_value = 21827
         offset = 1.250
         stroke = 6
 
-    if channel == 1:
+    #M1, Yaw
+    if channel == 0:
         min_value = 818
         max_value = 22960 - 818
         offset = 1.264
@@ -77,9 +79,9 @@ def read_ads1115(channel):
 
     return value, voltage, inches
 
-# Loop to read the analog input continuously
+# Loop to read the digital input continuously
 while True:
-    analog_value, voltage, inches = read_ads1115(1)  # Reading from channel 0
+    digital_value, voltage, inches = read_ads1115(0)  # Reading from channel 0
  
-    print("Analog Value: ", analog_value, "Voltage: ", round(voltage, 3), "Inches: ", round(inches, 3))
+    print("digital Value: ", digital_value, "Voltage: ", round(voltage, 3), "Inches: ", round(inches, 3))
     time.sleep(0.2)

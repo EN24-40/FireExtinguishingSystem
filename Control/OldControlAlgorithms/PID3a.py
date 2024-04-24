@@ -98,26 +98,26 @@ upper = SP + thresh
 count = 0
 
 for i in range(100):
-        act_ana, act_voltage, act_meas = read_ads1115(0)
-        # This command will be changed to fit with the function definition in adctest.py
+    act_ana, act_voltage, act_meas = read_ads1115(0)
+    # This command will be changed to fit with the function definition in adctest.py
 
-        if act_meas > lower and act_meas < upper:
-            count = count + 1
-        else:
-            count = 0
+    if act_meas > lower and act_meas < upper:
+        count = count + 1
+    else:
+        count = 0
 
-        if count >= 10:
-            print("breaked")
-            break
+    if count >= 10:
+        print("breaked")
+        break
 
-        if act_meas >= offset + 6 or act_meas < offset:
-            break
+    if act_meas >= offset + 6 or act_meas < offset:
+        break
 
 
-        if SP > offset + 6:
-            SP = offset + 6
-        if SP < offset:
-            SP = offset
+    if SP > offset + 6:
+        SP = offset + 6
+    if SP < offset:
+        SP = offset
 
 	e_prev = e		# Added
 
