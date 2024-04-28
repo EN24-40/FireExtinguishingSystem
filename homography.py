@@ -7,10 +7,10 @@ import cv2
 def homography(cX, cY):
     # Points in source (real world coordinates)
     # Bret under hoop, back corner of house, Connor near garage, Connor bottom right corner
-    pts_src = np.array([[-15.666, 1,1], [-15.666, 40,1], [5, 23,1], [15, 1, 1]]) # in FT 
+    pts_src = np.array([[-7.083, 7.916,1], [0, 16,1], [-7.916, 16,1], [9.166, 16, 1],[0,12.417,1]]) # in FT 
 
     # Points in camera image (pixels)
-    pts_dst = np.array([[-126, 65,1], [-126, 154, 1], [14, 131, 1], [140, 60, 1]])  # in Pixels
+    pts_dst = np.array([[-62,49,1], [5, 101, 1], [-44, 102, 1], [63, 106, 1],[3,86,1]])  # in Pixels
 
     # Calculate H in homography equation
     h, status = cv2.findHomography(pts_src, pts_dst)
@@ -73,6 +73,9 @@ def homography(cX, cY):
         spot = np.array([[cX-160],
                         [240-cY], 
                         [1]])
+        # spot = np.array([[105],
+        #                  [49], 
+        #                  [1]])
 
         prod = np.dot(inv_h, spot)
 
