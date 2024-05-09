@@ -12,6 +12,8 @@ For the thermal camera, `LeptonModule/software/raspberrypi_video` contains a mod
 2. `LeptonModule.cpp`: Controls the functionality of the thermal camera.
 3. `dewarp/liveDewarp.py`: Runs the correction algorithm to remove the fisheye frome the wide angle lense.
 
+Running `./startupscript` will build and run the camera code and a window will appear with the thermal image
+
 ### Localization
 
 Once a fire has been detected, the system must determine where in the real world that pixel corresponds to. This is a process known as localization and is done using a processs known as homography
